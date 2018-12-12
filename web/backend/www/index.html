@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Docker Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+        crossorigin="anonymous">
+
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Docker Management System</h1>
+        <hr>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a data-toggle="collapse" href="#collapse-add-container">Container hinzufügen</a>
+                </h3>
+            </div>
+            <div id="collapse-add-container" class="panel-collapse collapse">
+                <div class="panel-body">
+                    Neuen Container hinzufügen ...
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" href="#collapse-add-image">Image hinzufügen</a></h3>
+            </div>
+            <div id="collapse-add-image" class="panel-collapse collapse">
+                <div class="panel-body">
+                    Neues Image hinzufügen ...
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h3>Bestehende Docker-Container</h3>
+            <table id="container-table" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;" scope="col">#</th>
+                        <th style="width: 18%;" scope="col">Name</th>
+                        <th style="width: 18%;" scope="col">ID</th>
+                        <th style="width: 18%;" scope="col">Status</th>
+                        <th style="width: 18%;" scope="col">Image</th>
+                        <th style="width: 18%;" scope="col">Bearbeiten</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-default" onclick="fetchTableData();">
+                <span class="glyphicon glyphicon-refresh"></span> Aktualisieren
+            </button>
+        </section>
+    </div>
+
+    <script src="js/requests.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
