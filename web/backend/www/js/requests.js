@@ -1,14 +1,5 @@
 var baseURL = 'http://127.0.0.1:8000/api/';
-
-var fetchTableData = function() {
-    //getRequest("");
-    getAllDockerContainer();
-}
-
-var handleDeleteButton = function (dockerID) {
-//    deleteRequest(dockerID);
-//    postRequest(dockerID);
-}
+var containerList = [];
 
 var handleDuplicateButton = function (dockerID) {
     //getRequest('/' + dockerID);
@@ -30,7 +21,10 @@ var deleteDockerContainer = function (dockerID) {
     var url = baseURL + 'container/' + dockerID;
     sendRequest(url, 'DELETE', null, null, function (http) {
         console.log(http.responseText);
-        //TODO Refresh table
+        
+        var indexToRemove = getIndexFromContainerId(dockerID);
+        containerList.splice(indexToRemove, 1);
+        updateTable();
     });
 }
 
@@ -43,10 +37,33 @@ var deleteDockerContainer = function (dockerID) {
 var getDockerContainerById = function(dockerID) {
     var url = baseURL + 'container/' + dockerID;
     sendRequest(url, 'GET', null, null, function(http) {
-        var container = JSON.parse(http.responseText);
-        //TODO update table
+        var containerToInsert = JSON.parse(http.responseText);
+        var indexToInsert = getIndexFromContainerId(containerToInsert.id);
+
+        if(indexToInsert != -1) {
+            containerList[indexToInsert] = containerToInsert;
+        }
+
+        updateTable();
     });
 }
+
+/**
+ * Loops through the {@code containerList } and searches for a container
+ * with the given {@code containerID }.
+ * @param {number} containerID the id of the container to be found 
+ * 
+ * @returns the position of the container in the array or -1
+ */
+var getIndexFromContainerId = function (containerID) {
+    for(var i = 0; i < containerList.length; i++) {
+        if(containerList[i].id === containerID) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 
 /**
  * Sends a GET request to {@code baseRL/container} in order to
@@ -57,7 +74,16 @@ var getAllDockerContainer = function () {
     var url = baseURL + 'container';
     sendRequest(url, 'GET', null, null, function (http) {
         var containers = JSON.parse(http.responseText).containers;
-        updateTable(containers);
+        
+        containerList = [];
+
+        for(var i = 0; i < containers.length; i++) {
+            var c = containers[i];
+            var obj = new Container(c.id, c.name, c.status, c.image);
+            containerList.push(obj);
+        }
+
+        updateTable();
     });
 }
 
@@ -113,18 +139,16 @@ var sendRequest = function (url, operation, params, contentType, callback) {
 /**
  * This array contains all container instances and populates them in the table with
  * the id {@code container-table}. Before populating the data it clears the table.
- * {@link #addColumnsToRow(number, object, DOMObject)}.
- * 
- * @param {Array} containers array containing all container instances
+ * {@see #createTableRowFromContainer(number, container) }.
  */
-var updateTable = function (containers) {
+var updateTable = function () {
     var table = document.getElementById('container-table').getElementsByTagName('tbody')[0];
         
     // clear table 
     table.innerHTML = null;        
     
-    for(var i = 0; i < containers.length; i++) {
-        var tr = createTableRowFromContainer(i, containers[i]);
+    for(var i = 0; i < containerList.length; i++) {
+        var tr = createTableRowFromContainer(i, containerList[i]);
         table.appendChild(tr);
     }
 }
@@ -133,10 +157,10 @@ var updateTable = function (containers) {
  * Creates at least (container.props.length + 2) columns and adds them to the given
  * table row {@code tr}. The first column contains the row number following the columns 
  * for each property in the container. The last column is the button bar created by 
- * the following method {@link #createButtonRow(number)}.
+ * the following method {@see #createButtonRow(number)}.
  * 
  * @param {number} [i] the row number to insert the row at
- * @param {Object} container the docker container object containing the table data
+ * @param {Container} container the docker container object containing the table data
  * @return the table row {DOMObject} that was created
  */
 var createTableRowFromContainer = function(i, container) {
@@ -145,7 +169,11 @@ var createTableRowFromContainer = function(i, container) {
     
     for(var prop in container) {
         var td = document.createElement('td');
-        td.innerHTML = container[prop];
+        if(prop == 'id') {
+            td.innerHTML = container[prop].substring(0, 12);
+        } else {
+            td.innerHTML = container[prop];
+        }
         tr.appendChild(td);
     }
 
@@ -169,7 +197,7 @@ var createButtonRow = function(id) {
                 ' <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container clonen und starten" onclick="handleDuplicateButton(\''+id+'\');">' + 
                     '<span class="glyphicon glyphicon-duplicate"></span>' + 
                 '</button>' + 
-                '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container stoppen und löschen" onclick="handleDeleteButton(\''+id+'\');">' + 
+                '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container stoppen und löschen" onclick="deleteDockerContainer(\''+id+'\');">' + 
                     '<span class="glyphicon glyphicon-stop"></span>' + 
                 '</button>' + 
             '</div>';

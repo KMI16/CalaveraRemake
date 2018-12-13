@@ -27,7 +27,7 @@ router.route('/container')
             for(var i = 0; i < containers.length; i++) {
                 var tempContainer = {};
                 tempContainer.name = containers[i].data.Names[0];
-                tempContainer.id = (""+containers[i].data.Id).substring(0, 12);
+                tempContainer.id = containers[i].data.Id;
                 //tempContainer.image = containers[i].data.Image;
                 tempContainer.status = containers[i].data.Status;
                 tempContainer.image = containers[i].data.Image;
@@ -43,10 +43,19 @@ router.route('/container/:container_id')
     .get(function (request, response) {
         
         response.send("Got a GET request at /api/containers/" + request.params.container_id);
+
     })
     .delete(
         function (request, response) {
-            response.send("Got a DELETE request at /api/containers/" + request.params.container_id);
+            docker.container.list().then(containers => {
+                for(var i = 0; i < containers.length; i++) {
+                    if(containers[i].data.Id == request.params.container_id) {
+                        containers[i].stop();
+                        containers[i].delete({force: true});
+                    }
+                }
+            });
+            response.send("Container " + request.params.container_id + ' deleted successfully.');
         },
         function (err, obj) {
             response.send("Something went wrong with DELETE request at /api/containers/" + request.params.container_id);
