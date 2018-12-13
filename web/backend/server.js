@@ -16,14 +16,14 @@ router.use(function (request, response, next) {
 });
 
 
-router.route('/containers')
+router.route('/container')
     .post(function (request, response) {
         response.send("Got a POST request at /api/containers with " + request.body);
     })
     .get(function (request, response) {
         var containerArray = [];
 
-        docker.container.list({id:"6ed12813a280"}).then(containers => {
+        docker.container.list().then(containers => {
             for(var i = 0; i < containers.length; i++) {
                 var tempContainer = {};
                 tempContainer.name = containers[i].data.Names[0];
@@ -36,14 +36,10 @@ router.route('/containers')
             console.log(containerArray);
             response.send(JSON.stringify({"containers": containerArray}));
         });
-        
-        //response.send("Got a GET request at /api/containers");
-
-
     });
 
 
-router.route('/containers/:container_id')
+router.route('/container/:container_id')
     .get(function (request, response) {
         
         response.send("Got a GET request at /api/containers/" + request.params.container_id);
