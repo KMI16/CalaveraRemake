@@ -1,5 +1,5 @@
-var {Docker} = require('node-docker-api');
-var docker = new Docker({socketPath: '/var/run/docker.sock'});
+var { Docker } = require('node-docker-api');
+var docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 var express = require('express');
 var cors = require('cors');
@@ -11,53 +11,69 @@ app.use(express.static(__dirname + '/www/'));
 app.use(cors());
 app.use(express.json());
 
-router.use(function (request, response, next) {
+router.use(function(request, response, next) {
     next();
 });
 
+router.route('/image')
+    .post(function(request, response) {
+        response.send('Got a POST request at /api/image with ' + request.body);
+    })
+    .get(function(request, response) {
+        var imageNames = [];
+        docker.image.list().then(images => {
+            for (var image of images) {
+                if (image.data.RepoTags[0].startsWith('swe-')) {
+                    console.log("Adding: " + image.data.RepoTags[0]);
+                    imageNames.push(image.data.RepoTags[0]);
+                }
+            }
+            response.send(JSON.stringify({ 'image_names': imageNames }));
+        });
+        //response.send('Got a GET request at /api/image');
+    });
 
 router.route('/container')
-    .post(function (request, response) {
+    .post(function(request, response) {
         response.send("Got a POST request at /api/containers with " + request.body);
     })
-    .get(function (request, response) {
+    .get(function(request, response) {
         var containerArray = [];
 
         docker.container.list().then(containers => {
-            for(var i = 0; i < containers.length; i++) {
+            for (var i = 0; i < containers.length; i++) {
                 var tempContainer = {};
                 tempContainer.name = containers[i].data.Names[0];
                 tempContainer.id = containers[i].data.Id;
-                //tempContainer.image = containers[i].data.Image;
                 tempContainer.status = containers[i].data.Status;
                 tempContainer.image = containers[i].data.Image;
                 containerArray.push(tempContainer);
             }
             console.log(containerArray);
-            response.send(JSON.stringify({"containers": containerArray}));
+            response.send(JSON.stringify({ "containers": containerArray }));
         });
     });
 
 
 router.route('/container/:container_id')
-    .get(function (request, response) {
-        
+    .get(function(request, response) {
+
         response.send("Got a GET request at /api/containers/" + request.params.container_id);
 
     })
     .delete(
-        function (request, response) {
+        function(request, response) {
             docker.container.list().then(containers => {
-                for(var i = 0; i < containers.length; i++) {
-                    if(containers[i].data.Id == request.params.container_id) {
+                for (var i = 0; i < containers.length; i++) {
+                    if (containers[i].data.Id == request.params.container_id) {
                         containers[i].stop();
-                        containers[i].delete({force: true});
+                        containers[i].delete({ force: true });
                     }
                 }
             });
             response.send("Container " + request.params.container_id + ' deleted successfully.');
         },
-        function (err, obj) {
+        function(err, obj) {
             response.send("Something went wrong with DELETE request at /api/containers/" + request.params.container_id);
         }
     );
@@ -65,6 +81,6 @@ router.route('/container/:container_id')
 
 app.use('/api', router);
 
-app.listen(8000, () => {
-    console.log("Server running on port 8000");
+app.listen(8001, () => {
+    console.log("Server running on port 8001");
 });

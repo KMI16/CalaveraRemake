@@ -8,12 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
 
 </head>
@@ -28,9 +26,28 @@
                     <a data-toggle="collapse" href="#collapse-add-container">Container hinzufügen</a>
                 </h3>
             </div>
-            <div id="collapse-add-container" class="panel-collapse collapse">
+            <div id="collapse-add-container" class="panel-collapse collapse in">
                 <div class="panel-body">
-                    Neuen Container hinzufügen ...
+                    <form>
+                        <div class="col-sm-6">
+                            <section>
+                                <h4>Allgemeine Container Informationen</h4>
+                                <hr>
+                                <div class="form-group">
+                                    <label for="imageSelection">Image</label>
+                                    <select name="imageSelection" id="imageSelection" class="form-control">
+                                        <option value="default">Image auswählen</option>
+                                    </select>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="col-sm-6">
+                            <section>
+                                <h4>Zusätzeliche Container Informationen</h4>
+                                <hr>
+                            </section>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -41,42 +58,78 @@
             </div>
             <div id="collapse-add-image" class="panel-collapse collapse">
                 <div class="panel-body">
-                    Neues Image hinzufügen ...
+                    <form>
+                        <div class="col-sm-6">
+                            <section>
+                                <h4>Allgemeine Image Informationen</h4>
+                                <hr/>
+                                <div class="form-group">
+                                    <label for="imageNameInput">Image Name</label>
+                                    <input type="text" class="form-control" id="imageNameInput" placeholder="Geben Sie einen Namen für das Image ein">
+                                </div>
+                                <div class="form-group">
+                                    <label for="courseDescriptionInput">Kurs</label>
+                                    <input type="text" class="form-control" id="courseDescriptionInput" placeholder="Geben Sie einen Kursnamen ein ">
+                                    <div>
+                            </section>
+                            </div>
+                            <div class="col-sm-6">
+                                <h4>Komponenten für das Image</h4>
+                                <hr/>
+                                <div class="form-group">
+                                    <h5>Versionierung</h5>
+                                    <div class="checkbox">
+                                        <label><input type="checkbox" value="git">Git</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <h5>Programmiersprachen</h5>
+                                    <label class="checkbox-inline"><input type="checkbox" value="java">Java</label>
+                                    <label class="checkbox-inline"><input type="checkbox" value="c++">C++</label>
+                                    <label class="checkbox-inline"><input type="checkbox" value="c">C</label>
+                                    <label class="checkbox-inline"><input type="checkbox" value="android">Android</label>
+                                </div>
+                                <div class="form-group">
+                                    <h5>Entwicklungsumgebungen</h5>
+                                    <label class="checkbox-inline"><input type="checkbox" value="as">Android Studio</label>
+                                    <label class="checkbox-inline"><input type="checkbox" value="netbeans">Netbeans</label>
+                                    <label class="checkbox-inline"><input type="checkbox" value="vscode">VS Code</label>
+                                </div>
+                            </div>
+                    </form>
+                    </div>
+                    </div>
                 </div>
+
+                <section>
+                    <h3>Bestehende Docker-Container</h3>
+                    <table id="container-table" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;" scope="col">#</th>
+                                <th style="width: 18%;" scope="col">Name</th>
+                                <th style="width: 18%;" scope="col">ID</th>
+                                <th style="width: 18%;" scope="col">Status</th>
+                                <th style="width: 18%;" scope="col">Image</th>
+                                <th style="width: 18%;" scope="col">Bearbeiten</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-default" onclick="getAllDockerContainer();">
+                        <span class="glyphicon glyphicon-refresh"></span> Aktualisieren
+                    </button>
+                </section>
             </div>
-        </div>
 
-        <section>
-            <h3>Bestehende Docker-Container</h3>
-            <table id="container-table" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;" scope="col">#</th>
-                        <th style="width: 18%;" scope="col">Name</th>
-                        <th style="width: 18%;" scope="col">ID</th>
-                        <th style="width: 18%;" scope="col">Status</th>
-                        <th style="width: 18%;" scope="col">Image</th>
-                        <th style="width: 18%;" scope="col">Bearbeiten</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <button type="button" class="btn btn-default" onclick="getAllDockerContainer();">
-                <span class="glyphicon glyphicon-refresh"></span> Aktualisieren
-            </button>
-        </section>
-    </div>
+            <script src="js/Container.js"></script>
+            <script src="js/requests.js"></script>
 
-    <script src="js/Container.js"></script>
-    <script src="js/requests.js"></script>
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+            <!-- Latest compiled and minified JavaScript -->
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 
 </html>

@@ -1,13 +1,44 @@
-var baseURL = 'http://127.0.0.1:8000/api/';
+var baseURL = 'http://127.0.0.1:8001/api/';
 var containerList = [];
+var imageList = [];
 
-var handleDuplicateButton = function (dockerID) {
-    //getRequest('/' + dockerID);
+window.onload = function() {
+    getAllImages();
+    getAllDockerContainer();
+}
+
+/**
+ * Sends a GET request to {@code baseRL/image} in order to
+ * retrieve all images that are currently available. After retrieving
+ * the data will be populated in the image select.
+ */
+var getAllImages = function() {
+    var url = baseURL + 'image';
+    sendRequest(url, 'GET', null, null, function(http) {
+        var images = JSON.parse(http.responseText).image_names;
+        imageList = [];
+        for (var imageName of images) {
+            imageList.push(imageName);
+        }
+
+        var imageDropdown = document.getElementById('imageSelection');
+        for (var image of imageList) {
+            var element = document.createElement('option');
+            element.textContent = image.substring(image.indexOf('-') + 1);
+            element.value = image;
+            imageDropdown.appendChild(element);
+        }
+    });
+}
+
+
+var handleDuplicateButton = function(dockerID) {
     getAllDockerContainer();
 }
 
 var handleEditButton = function(dockerID) {
     console.log("hallo");
+    createAndStartContainer('');
 }
 
 /**
@@ -17,11 +48,11 @@ var handleEditButton = function(dockerID) {
  * 
  * @param {String} dockerID the docker to be deleted / stopped
  */
-var deleteDockerContainer = function (dockerID) {
+var deleteDockerContainer = function(dockerID) {
     var url = baseURL + 'container/' + dockerID;
-    sendRequest(url, 'DELETE', null, null, function (http) {
+    sendRequest(url, 'DELETE', null, null, function(http) {
         console.log(http.responseText);
-        
+
         var indexToRemove = getIndexFromContainerId(dockerID);
         containerList.splice(indexToRemove, 1);
         updateTable();
@@ -40,7 +71,7 @@ var getDockerContainerById = function(dockerID) {
         var containerToInsert = JSON.parse(http.responseText);
         var indexToInsert = getIndexFromContainerId(containerToInsert.id);
 
-        if(indexToInsert != -1) {
+        if (indexToInsert != -1) {
             containerList[indexToInsert] = containerToInsert;
         }
 
@@ -55,9 +86,9 @@ var getDockerContainerById = function(dockerID) {
  * 
  * @returns the position of the container in the array or -1
  */
-var getIndexFromContainerId = function (containerID) {
-    for(var i = 0; i < containerList.length; i++) {
-        if(containerList[i].id === containerID) {
+var getIndexFromContainerId = function(containerID) {
+    for (var i = 0; i < containerList.length; i++) {
+        if (containerList[i].id === containerID) {
             return i;
         }
     }
@@ -70,14 +101,14 @@ var getIndexFromContainerId = function (containerID) {
  * retrieve all containers that are currently running. After retrieving
  * the data will be populated in the container table. {@see #updateTable(containers) }.
  */
-var getAllDockerContainer = function () {
+var getAllDockerContainer = function() {
     var url = baseURL + 'container';
-    sendRequest(url, 'GET', null, null, function (http) {
+    sendRequest(url, 'GET', null, null, function(http) {
         var containers = JSON.parse(http.responseText).containers;
-        
+
         containerList = [];
 
-        for(var i = 0; i < containers.length; i++) {
+        for (var i = 0; i < containers.length; i++) {
             var c = containers[i];
             var obj = new Container(c.id, c.name, c.status, c.image);
             containerList.push(obj);
@@ -93,13 +124,13 @@ var getAllDockerContainer = function () {
  * 
  * @param {Object} container the container to be added and started
  */
-var createAndStartContainer = function (container) {
+var createAndStartContainer = function(container) {
     var url = baseURL + 'container';
     var data = {};
     data.dockerID = container;
     data.name = "Foo";
 
-    sendRequest(url, 'POST', JSON.stringify(data), 'application/json; charset=utf-8', function (http) {
+    sendRequest(url, 'POST', JSON.stringify(data), 'application/json; charset=utf-8', function(http) {
         console.log(http.responseText);
     });
 }
@@ -115,7 +146,7 @@ var createAndStartContainer = function (container) {
  * @param {String} contentType the content type - can be null to use default
  * @param {Function} callback function on success (status == 200 && readyState == 4)
  */
-var sendRequest = function (url, operation, params, contentType, callback) {
+var sendRequest = function(url, operation, params, contentType, callback) {
     var http = new XMLHttpRequest();
     http.open(operation, url);
 
@@ -123,7 +154,7 @@ var sendRequest = function (url, operation, params, contentType, callback) {
         http.setRequestHeader('Content-type', contentType);
     }
 
-    http.onreadystatechange = function () {
+    http.onreadystatechange = function() {
         if (http.readyState === 4) {
             if (http.status == 200) {
                 callback(http);
@@ -141,13 +172,13 @@ var sendRequest = function (url, operation, params, contentType, callback) {
  * the id {@code container-table}. Before populating the data it clears the table.
  * {@see #createTableRowFromContainer(number, container) }.
  */
-var updateTable = function () {
+var updateTable = function() {
     var table = document.getElementById('container-table').getElementsByTagName('tbody')[0];
-        
+
     // clear table 
-    table.innerHTML = null;        
-    
-    for(var i = 0; i < containerList.length; i++) {
+    table.innerHTML = null;
+
+    for (var i = 0; i < containerList.length; i++) {
         var tr = createTableRowFromContainer(i, containerList[i]);
         table.appendChild(tr);
     }
@@ -166,10 +197,10 @@ var updateTable = function () {
 var createTableRowFromContainer = function(i, container) {
     var tr = document.createElement('tr');
     tr.innerHTML = '<th scope="row">' + (i + 1) + '</th>';
-    
-    for(var prop in container) {
+
+    for (var prop in container) {
         var td = document.createElement('td');
-        if(prop == 'id') {
+        if (prop == 'id') {
             td.innerHTML = container[prop].substring(0, 12);
         } else {
             td.innerHTML = container[prop];
@@ -190,16 +221,16 @@ var createTableRowFromContainer = function(i, container) {
  */
 var createButtonRow = function(id) {
     id = id + "";
-    return '<div class="btn-group" role="group" aria-label="...">' + 
-                '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container bearbeiten" onclick="handleEditButton(\'' + id + '\');">' + 
-                    '<span class="glyphicon glyphicon-pencil"></span>' + 
-                '</button>' + 
-                ' <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container clonen und starten" onclick="handleDuplicateButton(\''+id+'\');">' + 
-                    '<span class="glyphicon glyphicon-duplicate"></span>' + 
-                '</button>' + 
-                '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container stoppen und löschen" onclick="deleteDockerContainer(\''+id+'\');">' + 
-                    '<span class="glyphicon glyphicon-stop"></span>' + 
-                '</button>' + 
-            '</div>';
+    return '<div class="btn-group" role="group" aria-label="...">' +
+        '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container bearbeiten" onclick="handleEditButton(\'' + id + '\');">' +
+        '<span class="glyphicon glyphicon-pencil"></span>' +
+        '</button>' +
+        ' <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container clonen und starten" onclick="handleDuplicateButton(\'' + id + '\');">' +
+        '<span class="glyphicon glyphicon-duplicate"></span>' +
+        '</button>' +
+        '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container stoppen und löschen" onclick="deleteDockerContainer(\'' + id + '\');">' +
+        '<span class="glyphicon glyphicon-stop"></span>' +
+        '</button>' +
+        '</div>';
 
 }
