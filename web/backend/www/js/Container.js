@@ -1,7 +1,7 @@
 class Container {
     constructor(id, name, status, image) {
-        this.id = id;
         this.name = name;
+        this.id = id;
         this.status = status;
         this.image = image;
     }

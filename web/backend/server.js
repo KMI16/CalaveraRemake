@@ -36,12 +36,18 @@ router.route('/image')
 router.route('/container')
     .post(function(request, response) {
         response.send("Got a POST request at /api/containers with " + request.body);
+
+        console.log(request.body);
+
+        docker.container.create(request.body).then(container => container.start()).catch(error => console.log(error));
     })
     .get(function(request, response) {
         var containerArray = [];
 
         docker.container.list().then(containers => {
             for (var i = 0; i < containers.length; i++) {
+                console.log(containers[i].data);
+
                 var tempContainer = {};
                 tempContainer.name = containers[i].data.Names[0];
                 tempContainer.id = containers[i].data.Id;
@@ -81,6 +87,6 @@ router.route('/container/:container_id')
 
 app.use('/api', router);
 
-app.listen(8001, () => {
-    console.log("Server running on port 8001");
+app.listen(4200, () => {
+    console.log("Server running on port 4200");
 });

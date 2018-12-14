@@ -1,4 +1,4 @@
-var baseURL = 'http://127.0.0.1:8001/api/';
+var baseURL = 'http://127.0.0.1:4200/api/';
 var containerList = [];
 var imageList = [];
 
@@ -29,6 +29,53 @@ var getAllImages = function() {
             imageDropdown.appendChild(element);
         }
     });
+}
+
+var handleStartContainerButton = function() {
+    var container = {};
+    container.Image = document.getElementById("imageSelection").value;
+
+    var envs = [];
+    envs.push('GIT_REPOS_URL=' + document.getElementById('gitReposURL').value);
+    envs.push('GIT_USER_NAME=' + document.getElementById('gitReposUser').value);
+    envs.push('GIT_PASSWORD=' + document.getElementById('gitReposPassword').value);
+    envs.push('VNC_RESOLUTION=1366x768');
+
+
+    for (var line in document.getElementById('environmentVariables').value.split('\n')) {
+        envs.push(line);
+    }
+
+    container.Env = envs;
+
+    var vncPort = document.getElementById('vncPort').value + "/tcp";
+    var noVncPort = document.getElementById('noVncPort').value + "/tcp";
+
+    var ports = {};
+    //ports[vncPort] = {};
+    //ports[noVncPort] = {};
+    container.ExposedPorts = {
+        "6901/tcp": {},
+        "5901/tcp": {}
+    };
+    container.ExposedPorts = ports;
+
+    /*
+    var bindings = {};
+    bindings[vncPort] = [{ "HostPort": document.getElementById('vncPort').value }];
+    bindings[noVncPort] = [{ "HostPort": document.getElementById('noVncPort').value }];
+
+    container.PortBindings = bindings;*/
+
+    console.log(container);
+
+
+    container.PortBindings = {
+        "6901/tcp": [{ "HostPort": document.getElementById('noVncPort').value }],
+        "5901/tcp": [{ "HostPort": document.getElementById('vncPort').value }]
+    };
+    createAndStartContainer(container);
+
 }
 
 
@@ -126,11 +173,8 @@ var getAllDockerContainer = function() {
  */
 var createAndStartContainer = function(container) {
     var url = baseURL + 'container';
-    var data = {};
-    data.dockerID = container;
-    data.name = "Foo";
 
-    sendRequest(url, 'POST', JSON.stringify(data), 'application/json; charset=utf-8', function(http) {
+    sendRequest(url, 'POST', JSON.stringify(container), 'application/json; charset=utf-8', function(http) {
         console.log(http.responseText);
     });
 }

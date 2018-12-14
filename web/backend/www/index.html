@@ -28,72 +28,107 @@
             </div>
             <div id="collapse-add-container" class="panel-collapse collapse in">
                 <div class="panel-body">
-                    <form>
-                        <div class="col-sm-6">
-                            <section>
-                                <h4>Allgemeine Container Informationen</h4>
-                                <hr>
-                                <div class="form-group">
-                                    <label for="imageSelection">Image</label>
-                                    <select name="imageSelection" id="imageSelection" class="form-control">
-                                        <option value="default">Image auswählen</option>
-                                    </select>
-                                </div>
-                            </section>
-                        </div>
-                        <div class="col-sm-6">
-                            <section>
-                                <h4>Zusätzeliche Container Informationen</h4>
-                                <hr>
-                            </section>
-                        </div>
-                    </form>
+                    <div class="row">
+                        <form>
+                            <div class="col-sm-6">
+                                <section>
+                                    <h4>Allgemeine Container Informationen</h4>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label for="imageSelection">Image</label>
+                                        <select name="imageSelection" id="imageSelection" class="form-control">
+                                            <option value="default">Image auswählen</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="gitReposURl">Git Repository URL</label>
+                                        <input class="form-control" name="gitReposURL" id="gitReposURL" type="url" placeholder="https://github.com/Username/repos.git" />
+                                    </div>
+                                    <div class="row ">
+                                        <div class="col-sm-6 form-group">
+                                            <label for="gitReposUser">Git Nutzername</label>
+                                            <input class="form-control" placeholder="Nutzername" name="gitReposUser" id="gitReposUser" />
+                                        </div>
+                                        <div class="col-sm-6 form-group">
+                                            <label for="gitReposPassword">Git Password</label>
+                                            <input type="password" placeholder="Password" class="form-control" name="gitReposPassword" id="gitReposPassword" />
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="col-sm-6">
+                                <section>
+                                    <h4>Zusätzeliche Container Informationen</h4>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label for="environmentVariables">Umgebungsvariablen</label>
+                                        <textarea class="form-control" placeholder="key: value" id="environmentVariables" name="environmentVariables"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <h4>Port-Einstellungen</h4>
+                                        <hr>
+                                        <div class="row ">
+                                            <div class="col-sm-6 form-group">
+                                                <label for="vncPort">VNC Port</label>
+                                                <input type="number" placeholder="5901" class="form-control " name="vncPort" id="vncPort" />
+                                            </div>
+                                            <div class="col-sm-6 form-group ">
+                                                <label for="noVncPort">NO_VNC Port</label>
+                                                <input type="number " placeholder="6901 " class="form-control " name="noVncPort" id="noVncPort" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </form>
+                    </div>
+                    <button type="button " class="btn btn-default" onclick="handleStartContainerButton();"><span class="glyphicon glyphicon-plus "></span> Container starten</button>
                 </div>
             </div>
         </div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><a data-toggle="collapse" href="#collapse-add-image">Image hinzufügen</a></h3>
+        <div class="panel panel-default ">
+            <div class="panel-heading ">
+                <h3 class="panel-title "><a data-toggle="collapse " href="#collapse-add-image ">Image hinzufügen</a></h3>
             </div>
-            <div id="collapse-add-image" class="panel-collapse collapse">
-                <div class="panel-body">
+            <div id="collapse-add-image " class="panel-collapse collapse ">
+                <div class="panel-body ">
                     <form>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 ">
                             <section>
                                 <h4>Allgemeine Image Informationen</h4>
                                 <hr/>
-                                <div class="form-group">
-                                    <label for="imageNameInput">Image Name</label>
-                                    <input type="text" class="form-control" id="imageNameInput" placeholder="Geben Sie einen Namen für das Image ein">
+                                <div class="form-group ">
+                                    <label for="imageNameInput ">Image Name</label>
+                                    <input type="text " class="form-control " id="imageNameInput " placeholder="Geben Sie einen Namen für das Image ein ">
                                 </div>
-                                <div class="form-group">
-                                    <label for="courseDescriptionInput">Kurs</label>
-                                    <input type="text" class="form-control" id="courseDescriptionInput" placeholder="Geben Sie einen Kursnamen ein ">
+                                <div class="form-group ">
+                                    <label for="courseDescriptionInput ">Kurs</label>
+                                    <input type="text " class="form-control " id="courseDescriptionInput " placeholder="Geben Sie einen Kursnamen ein ">
                                     <div>
                             </section>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-6 ">
                                 <h4>Komponenten für das Image</h4>
                                 <hr/>
-                                <div class="form-group">
+                                <div class="form-group ">
                                     <h5>Versionierung</h5>
-                                    <div class="checkbox">
-                                        <label><input type="checkbox" value="git">Git</label>
+                                    <div class="checkbox ">
+                                        <label><input type="checkbox " value="git ">Git</label>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group ">
                                     <h5>Programmiersprachen</h5>
-                                    <label class="checkbox-inline"><input type="checkbox" value="java">Java</label>
-                                    <label class="checkbox-inline"><input type="checkbox" value="c++">C++</label>
-                                    <label class="checkbox-inline"><input type="checkbox" value="c">C</label>
-                                    <label class="checkbox-inline"><input type="checkbox" value="android">Android</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="java ">Java</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="c++ ">C++</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="c ">C</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="android ">Android</label>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group ">
                                     <h5>Entwicklungsumgebungen</h5>
-                                    <label class="checkbox-inline"><input type="checkbox" value="as">Android Studio</label>
-                                    <label class="checkbox-inline"><input type="checkbox" value="netbeans">Netbeans</label>
-                                    <label class="checkbox-inline"><input type="checkbox" value="vscode">VS Code</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="as ">Android Studio</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="netbeans ">Netbeans</label>
+                                    <label class="checkbox-inline "><input type="checkbox " value="vscode ">VS Code</label>
                                 </div>
                             </div>
                     </form>
@@ -103,33 +138,33 @@
 
                 <section>
                     <h3>Bestehende Docker-Container</h3>
-                    <table id="container-table" class="table table-hover">
+                    <table id="container-table" class="table table-hover ">
                         <thead>
                             <tr>
-                                <th style="width: 10%;" scope="col">#</th>
-                                <th style="width: 18%;" scope="col">Name</th>
-                                <th style="width: 18%;" scope="col">ID</th>
-                                <th style="width: 18%;" scope="col">Status</th>
-                                <th style="width: 18%;" scope="col">Image</th>
-                                <th style="width: 18%;" scope="col">Bearbeiten</th>
+                                <th style="width: 10%; " scope="col ">#</th>
+                                <th style="width: 18%; " scope="col ">Name</th>
+                                <th style="width: 18%; " scope="col ">ID</th>
+                                <th style="width: 18%; " scope="col ">Status</th>
+                                <th style="width: 18%; " scope="col ">Image</th>
+                                <th style="width: 18%; " scope="col ">Bearbeiten</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
-                    <button type="button" class="btn btn-default" onclick="getAllDockerContainer();">
-                        <span class="glyphicon glyphicon-refresh"></span> Aktualisieren
+                    <button type="button " class="btn btn-default " onclick="getAllDockerContainer(); ">
+                        <span class="glyphicon glyphicon-refresh "></span> Aktualisieren
                     </button>
                 </section>
             </div>
 
-            <script src="js/Container.js"></script>
-            <script src="js/requests.js"></script>
+            <script src="js/Container.js "></script>
+            <script src="js/requests.js "></script>
 
-            <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js " integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin=" anonymous "></script>
 
             <!-- Latest compiled and minified JavaScript -->
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js " integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa " crossorigin="anonymous "></script>
 </body>
 
 </html>
