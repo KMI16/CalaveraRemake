@@ -10,4 +10,12 @@ class Container {
         return container.id === this.id;
     }
 
+    getPortsAsString() {
+        var portString = "";
+        for (var port in ports) {
+            portString += port.privatePort + ":" + port.publicPort;
+            portString += " ";
+        }
+        return portString;
+    }
 }

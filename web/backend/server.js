@@ -46,14 +46,16 @@ router.route('/container')
 
         docker.container.list().then(containers => {
             for (var i = 0; i < containers.length; i++) {
-                console.log(containers[i].data);
-
-                var tempContainer = {};
-                tempContainer.name = containers[i].data.Names[0];
-                tempContainer.id = containers[i].data.Id;
-                tempContainer.status = containers[i].data.Status;
-                tempContainer.image = containers[i].data.Image;
-                containerArray.push(tempContainer);
+                if (containers[i].data.Image.startsWith('swe-')) {
+                    var tempContainer = {};
+                    tempContainer.name = containers[i].data.Names[0];
+                    tempContainer.id = containers[i].data.Id;
+                    tempContainer.status = containers[i].data.Status;
+                    tempContainer.image = containers[i].data.Image;
+                    //             tempContainer.ports = containers[i].data.Ports;
+                    console.log(containers[i].data);
+                    containerArray.push(tempContainer);
+                }
             }
             console.log(containerArray);
             response.send(JSON.stringify({ "containers": containerArray }));

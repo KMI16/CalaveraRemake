@@ -48,27 +48,10 @@ var handleStartContainerButton = function() {
 
     container.Env = envs;
 
-    var vncPort = document.getElementById('vncPort').value + "/tcp";
-    var noVncPort = document.getElementById('noVncPort').value + "/tcp";
-
-    var ports = {};
-    //ports[vncPort] = {};
-    //ports[noVncPort] = {};
     container.ExposedPorts = {
         "6901/tcp": {},
         "5901/tcp": {}
     };
-    container.ExposedPorts = ports;
-
-    /*
-    var bindings = {};
-    bindings[vncPort] = [{ "HostPort": document.getElementById('vncPort').value }];
-    bindings[noVncPort] = [{ "HostPort": document.getElementById('noVncPort').value }];
-
-    container.PortBindings = bindings;*/
-
-    console.log(container);
-
 
     container.PortBindings = {
         "6901/tcp": [{ "HostPort": document.getElementById('noVncPort').value }],
