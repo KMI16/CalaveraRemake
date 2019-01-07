@@ -41,8 +41,12 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="gitReposURl">Git Repository URL</label>
+                                        <label id="gitReposUrlLabel" for="gitReposURl">Git Repository URL</label>
                                         <input class="form-control" name="gitReposURL" id="gitReposURL" type="url" placeholder="https://github.com/Username/repos.git" />
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="isInternalGit">
+                                            <label class="form-check-label" for="isInternalGit">Internen Git-Server benutzen</label>
+                                        </div>
                                     </div>
                                     <div class="row ">
                                         <div class="col-sm-6 form-group">
@@ -58,11 +62,11 @@
                             </div>
                             <div class="col-sm-6">
                                 <section>
-                                    <h4>Zusätzeliche Container Informationen</h4>
+                                    <h4>Zusätzliche Container Informationen</h4>
                                     <hr>
                                     <div class="form-group">
-                                        <label for="environmentVariables">Umgebungsvariablen</label>
-                                        <textarea class="form-control" placeholder="key: value" id="environmentVariables" name="environmentVariables"></textarea>
+                                        <label for="environmentVariables">Umgebungsvariablen <span title="z.B.&#013;&#010;VNC_PW=password&#013;&#010;VNC_RESOLUTION=768x600">&#9432;</span></label>
+                                        <textarea class="form-control" spellcheck="false" placeholder="key=value" id="environmentVariables" name="environmentVariables"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <h4>Port-Einstellungen</h4>
@@ -160,6 +164,7 @@
 
             <script src="js/Container.js "></script>
             <script src="js/requests.js "></script>
+            <script src="js/eventlistener.js"></script>
 
             <script src="js/jquery-3.3.1.js"></script>
 

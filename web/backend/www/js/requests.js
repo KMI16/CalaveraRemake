@@ -35,15 +35,27 @@ var handleStartContainerButton = function() {
     var container = {};
     container.Image = document.getElementById("imageSelection").value;
 
+    var gitReposUrl = document.getElementById('gitReposURL').value;
+
+    if (document.getElementById('isInternalGit').checked) {
+        gitReposUrl = "ssh://git@localhost:2222/git-server/repos/" + gitReposUrl.replace(/\.git/g, '') + ".git";
+    }
+
     var envs = [];
-    envs.push('GIT_REPOS_URL=' + document.getElementById('gitReposURL').value);
+
+    envs.push('GIT_REPOS_URL=' + gitReposUrl);
     envs.push('GIT_USER_NAME=' + document.getElementById('gitReposUser').value);
     envs.push('GIT_PASSWORD=' + document.getElementById('gitReposPassword').value);
     envs.push('VNC_RESOLUTION=1366x768');
 
-
-    for (var line in document.getElementById('environmentVariables').value.split('\n')) {
-        envs.push(line);
+    // check if enviroenment variables are present
+    if (document.getElementById('environmentVariables').value != '') {
+        for (var line of document.getElementById('environmentVariables').value.split('\n')) {
+            // if line is a valid environment variable name=value
+            if (line.match(/[a-zA-Z]+([a-zA-Z\d_]+)?=.+/g)) {
+                envs.push(line);
+            }
+        }
     }
 
     container.Env = envs;
@@ -57,7 +69,10 @@ var handleStartContainerButton = function() {
         "6901/tcp": [{ "HostPort": document.getElementById('noVncPort').value }],
         "5901/tcp": [{ "HostPort": document.getElementById('vncPort').value }]
     };
-    container.NetworkMode = "host";
+
+    if (document.getElementById('isInternalGit').checked) {
+        container.NetworkMode = "host";
+    }
     createAndStartContainer(container);
 
 }
@@ -68,7 +83,6 @@ var handleDuplicateButton = function(dockerID) {
 }
 
 var handleEditButton = function(dockerID) {
-    console.log("hallo");
     createAndStartContainer('');
 }
 

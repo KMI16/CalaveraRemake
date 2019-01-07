@@ -1,1 +1,0 @@
-autostart enable -n "CalaveraRemake" -p "/home/kulle/Schreibtisch/web/backend" -c "node server.js"

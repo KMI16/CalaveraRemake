@@ -52,7 +52,6 @@ router.route('/container')
                     tempContainer.id = containers[i].data.Id;
                     tempContainer.status = containers[i].data.Status;
                     tempContainer.image = containers[i].data.Image;
-                    //             tempContainer.ports = containers[i].data.Ports;
                     console.log(containers[i].data);
                     containerArray.push(tempContainer);
                 }

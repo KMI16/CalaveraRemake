@@ -7,15 +7,15 @@
 [ ! -d ${PWD}/data/repos ] && mkdir -p ${PWD}/data/repos
 [ ! -d ${PWD}/data/keys ] && mkdir -p ${PWD}/data/keys
 
-rm -f -r ${PWD}/data/repos/*
+#rm -f -r ${PWD}/data/repos/*
 rm -f -r ${PWD}/data/keys/*
 
-
-# create new ssh-key if not exists and copy it
-# into the keys folder of the git server
+# create new ssh-key if not exists
 if [ ! -f ~/.ssh/id_rsa.pub ]
 then
-    ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -P ""
+    ssh-keygen -t rsa -f ~/.ssh/id_rsa -C "KMI16@byom.de" -q -P ""
 fi
+
+# copy it into the keys folder of the git server
 cp ~/.ssh/id_rsa.pub ${PWD}/data/keys
 cp ~/.ssh/id_rsa ${PWD}/data/keys
