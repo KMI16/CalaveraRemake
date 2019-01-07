@@ -10,13 +10,16 @@ ENV GIT_REPOS_URL=yourgitrepos@github.com \
 
 # Add git script and give permission
 ADD scripts/gitpull.sh Desktop/Projekt/scripts/gitpull.sh
-#RUN chmod +x Desktop/Projekt/scripts/gitpull.sh
 
 # Add git push script and give permission
 ADD scripts/gitpush.sh Desktop/Projekt/scripts/gitpush.sh
-#RUN chmod +x Desktop/Projekt/scripts/gitpush.sh
 
 RUN chmod -R +x Desktop/Projekt/scripts/*
+
+# Copy SSH Key in order to allow ssh access from the internal github server
+ADD git-server/data/keys/id_rsa.pub Desktop/Projekt/ssh/id_rsa.pub
+ADD git-server/data/keys/id_rsa Desktop/Projekt/ssh/id_rsa
+
 
 # add both scripts to path so it can be excuted everywhere
 ENV PATH="${HOME}/Desktop/Projekt/scripts/:${PATH}"
@@ -42,8 +45,3 @@ RUN ln -s $(which netbeans) Desktop
 
 # install git
 RUN apt-get install -y git
-
-# Run the gitsript
-#RUN crontab -l | { cat; echo "@reboot ./Desktop/Projekt/scripts/gitscript.sh"; } | crontab -
-#RUN ./Desktop/Projekt/scripts/gitscript.sh
-

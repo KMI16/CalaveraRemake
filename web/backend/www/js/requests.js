@@ -57,6 +57,7 @@ var handleStartContainerButton = function() {
         "6901/tcp": [{ "HostPort": document.getElementById('noVncPort').value }],
         "5901/tcp": [{ "HostPort": document.getElementById('vncPort').value }]
     };
+    container.NetworkMode = "host";
     createAndStartContainer(container);
 
 }
