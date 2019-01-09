@@ -1,6 +1,9 @@
 var baseURL = 'http://127.0.0.1:4200/api/';
 var containerList = [];
 var imageList = [];
+var canRefresh = true;
+
+window.onbeforeunload = function() { return canRefresh; }
 
 window.onload = function() {
     getAllImages();
@@ -15,20 +18,76 @@ window.onload = function() {
 var getAllImages = function() {
     var url = baseURL + 'image';
     sendRequest(url, 'GET', null, null, function(http) {
-        var images = JSON.parse(http.responseText).image_names;
+        var images = JSON.parse(http.responseText).images;
+
+        var processingImages = [];
+        for (var img of imageList) {
+            if (img.status == "in process") {
+                processingImages.push(img);
+            }
+        }
+        console.log(processingImages);
+
         imageList = [];
-        for (var imageName of images) {
-            imageList.push(imageName);
+        for (var i = 0; i < images.length; i++) {
+            imageList.push(new Image(images[i].name, images[i].size, images[i].status));
+        }
+
+        if (processingImages.length > 0) {
+            imageList.push(processingImages);
         }
 
         var imageDropdown = document.getElementById('imageSelection');
+        imageDropdown.innerHTML = null;
+
+        var option = document.createElement('option');
+        option.value = "default";
+        option.innerHTML = "Image auswählen";
+        imageDropdown.appendChild(option);
+
         for (var image of imageList) {
             var element = document.createElement('option');
-            element.textContent = image.substring(image.indexOf('-') + 1);
-            element.value = image;
+            element.textContent = image.name.substring(image.name.indexOf('-') + 1);
+            element.value = image.name;
             imageDropdown.appendChild(element);
         }
+        updateImageTable();
     });
+}
+
+var handleCreateImageButton = function() {
+    canRefresh = false;
+    var features = [];
+
+    var componentDiv = document.getElementById("component-checkboxes");
+    var selectedBoxes = componentDiv.querySelectorAll('input[type="checkbox"]:checked');
+
+    for (var i = 0; i < selectedBoxes.length; i++) {
+        features.push(selectedBoxes[i].value);
+    }
+
+    var body = {
+        "title": document.getElementById('imageNameInput').value,
+        "features": features
+    };
+
+    var courseDescriptionInput = document.getElementById('courseDescriptionInput').value;
+    if (courseDescriptionInput != "") {
+        body.courseName = courseDescriptionInput;
+    }
+
+    var title = 'swe-' + body.title.toLowerCase();
+    if (body.courseName) {
+        title += '-' + body.courseName.toLowerCase();
+    }
+    imageList.push(new Image(title, 'n/a', 'in process'));
+    updateImageTable();
+
+    sendRequest(baseURL + 'image', 'POST', JSON.stringify(body), 'application/json; charset=utf-8', function(http) {
+        console.log(http.responseText);
+        getAllImages();
+    });
+
 }
 
 var handleStartContainerButton = function() {
@@ -100,7 +159,20 @@ var deleteDockerContainer = function(dockerID) {
 
         var indexToRemove = getIndexFromContainerId(dockerID);
         containerList.splice(indexToRemove, 1);
-        updateTable();
+        updateContainerTable();
+    });
+}
+
+var handleDeleteImage = function(i) {
+    var image = imageList[i];
+    deleteDockerImage(image.name);
+}
+
+var deleteDockerImage = function(name) {
+    var url = baseURL + 'image/' + name;
+    sendRequest(url, 'DELETE', null, null, function(http) {
+        console.log(http.responseText);
+        getAllImages();
     });
 }
 
@@ -120,7 +192,7 @@ var getDockerContainerById = function(dockerID) {
             containerList[indexToInsert] = containerToInsert;
         }
 
-        updateTable();
+        updateContainerTable();
     });
 }
 
@@ -144,7 +216,7 @@ var getIndexFromContainerId = function(containerID) {
 /**
  * Sends a GET request to {@code baseRL/container} in order to
  * retrieve all containers that are currently running. After retrieving
- * the data will be populated in the container table. {@see #updateTable(containers) }.
+ * the data will be populated in the container table. {@see #updateContainerTable(containers) }.
  */
 var getAllDockerContainer = function() {
     var url = baseURL + 'container';
@@ -159,7 +231,7 @@ var getAllDockerContainer = function() {
             containerList.push(obj);
         }
 
-        updateTable();
+        updateContainerTable();
     });
 }
 
@@ -171,9 +243,11 @@ var getAllDockerContainer = function() {
  */
 var createAndStartContainer = function(container) {
     var url = baseURL + 'container';
-
+    canRefresh = false;
     sendRequest(url, 'POST', JSON.stringify(container), 'application/json; charset=utf-8', function(http) {
         console.log(http.responseText);
+        canRefresh = true;
+        getAllDockerContainer();
     });
 }
 
@@ -214,7 +288,7 @@ var sendRequest = function(url, operation, params, contentType, callback) {
  * the id {@code container-table}. Before populating the data it clears the table.
  * {@see #createTableRowFromContainer(number, container) }.
  */
-var updateTable = function() {
+var updateContainerTable = function() {
     var table = document.getElementById('container-table').getElementsByTagName('tbody')[0];
 
     // clear table 
@@ -224,6 +298,19 @@ var updateTable = function() {
         var tr = createTableRowFromContainer(i, containerList[i]);
         table.appendChild(tr);
     }
+}
+
+var updateImageTable = function() {
+    var table = document.getElementById('image-table').getElementsByTagName('tbody')[0];
+
+    //clear table
+    table.innerHTML = null;
+
+    for (var i = 0; i < imageList.length; i++) {
+        var tr = createTableRowFromImage(i, imageList[i]);
+        table.appendChild(tr);
+    }
+    canRefresh = true;
 }
 
 /**
@@ -253,6 +340,26 @@ var createTableRowFromContainer = function(i, container) {
     var buttonCol = document.createElement('td');
     buttonCol.innerHTML = createButtonRow(container.id);
     tr.appendChild(buttonCol);
+
+    return tr;
+}
+
+var createTableRowFromImage = function(i, image) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<th scope="row">' + (i + 1) + '</th>'
+
+    for (var prop in image) {
+        var td = document.createElement('td');
+        if (prop == 'name') {
+            td.innerHTML = image[prop].substring(image.name.indexOf('-') + 1);
+        } else {
+            td.innerHTML = image[prop];
+        }
+        tr.appendChild(td);
+    }
+    var td = document.createElement('td');
+    td.innerHTML = '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Image löschen" onclick="handleDeleteImage(\'' + i + '\');"><span class="glyphicon glyphicon-trash"></span></button>';
+    tr.appendChild(td);
 
     return tr;
 }

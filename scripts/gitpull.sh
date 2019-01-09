@@ -5,7 +5,7 @@
 # the script is 'called the first time' when the src folder does not exist
 if [ "${GIT_REPOS_URL:0:3}" = 'ssh' ] && [ ! -d $HOME/Desktop/Projekt/src ]
 then
-    ssh-add $HOME/Desktop/Projekt/ssh/id_rsa
+    ssh-add $HOME/Desktop/Projekt/ssh/id_calavera_git_server
 fi
 
 # configure git account

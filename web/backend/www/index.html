@@ -26,7 +26,7 @@
                     <a data-toggle="collapse" href="#collapse-add-container">Container hinzufügen</a>
                 </h3>
             </div>
-            <div id="collapse-add-container" class="panel-collapse collapse in">
+            <div id="collapse-add-container" class="panel-collapse collapse">
                 <div class="panel-body">
                     <div class="row">
                         <form>
@@ -35,13 +35,13 @@
                                     <h4>Allgemeine Container Informationen</h4>
                                     <hr>
                                     <div class="form-group">
-                                        <label for="imageSelection">Image</label>
+                                        <label for="imageSelection">Image *</label>
                                         <select name="imageSelection" id="imageSelection" class="form-control">
                                             <option value="default">Image auswählen</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label id="gitReposUrlLabel" for="gitReposURl">Git Repository URL</label>
+                                        <label id="gitReposUrlLabel" for="gitReposURl">Git Repository URL *</label>
                                         <input class="form-control" name="gitReposURL" id="gitReposURL" type="url" placeholder="https://github.com/Username/repos.git" />
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="isInternalGit">
@@ -73,11 +73,11 @@
                                         <hr>
                                         <div class="row ">
                                             <div class="col-sm-6 form-group">
-                                                <label for="vncPort">VNC Port</label>
+                                                <label for="vncPort">VNC Port *</label>
                                                 <input type="number" placeholder="5901" class="form-control " name="vncPort" id="vncPort" />
                                             </div>
                                             <div class="col-sm-6 form-group ">
-                                                <label for="noVncPort">NO_VNC Port</label>
+                                                <label for="noVncPort">NO_VNC Port *</label>
                                                 <input type="number " placeholder="6901 " class="form-control " name="noVncPort" id="noVncPort" />
                                             </div>
                                         </div>
@@ -90,86 +90,113 @@
                 </div>
             </div>
         </div>
+        <section>
+            <h3>Bestehende Docker-Container</h3>
+            <table id="container-table" class="table table-hover ">
+                <thead>
+                    <tr>
+                        <th style="width: 10%; " scope="col ">#</th>
+                        <th style="width: 18%; " scope="col ">Name</th>
+                        <th style="width: 18%; " scope="col ">ID</th>
+                        <th style="width: 18%; " scope="col ">Status</th>
+                        <th style="width: 18%; " scope="col ">Image</th>
+                        <th style="width: 18%; " scope="col ">Bearbeiten</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="button " class="btn btn-default " onclick="getAllDockerContainer(); ">
+                        <span class="glyphicon glyphicon-refresh "></span> Aktualisieren
+                    </button>
+        </section>
 
-        <div class="panel panel-default ">
-            <div class="panel-heading ">
-                <h3 class="panel-title "><a data-toggle="collapse " href="#collapse-add-image ">Image hinzufügen</a></h3>
+
+        <br/>
+        <hr/><br/>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" href="#collapse-add-image">Image hinzufügen</a></h3>
             </div>
-            <div id="collapse-add-image " class="panel-collapse collapse ">
-                <div class="panel-body ">
+            <div id="collapse-add-image" class="panel-collapse collapse">
+                <div class="panel-body">
                     <form>
-                        <div class="col-sm-6 ">
+                        <div class="col-sm-6">
                             <section>
                                 <h4>Allgemeine Image Informationen</h4>
                                 <hr/>
-                                <div class="form-group ">
-                                    <label for="imageNameInput ">Image Name</label>
-                                    <input type="text " class="form-control " id="imageNameInput " placeholder="Geben Sie einen Namen für das Image ein ">
+                                <div class="form-group">
+                                    <label for="imageNameInput">Image Name *</label>
+                                    <input type="text" class="form-control" id="imageNameInput" placeholder="Geben Sie einen Namen für das Image ein">
                                 </div>
-                                <div class="form-group ">
-                                    <label for="courseDescriptionInput ">Kurs</label>
-                                    <input type="text " class="form-control " id="courseDescriptionInput " placeholder="Geben Sie einen Kursnamen ein ">
-                                    <div>
+                                <div class="form-group">
+                                    <label for="courseDescriptionInput">Kurs</label>
+                                    <input type="text" class="form-control" id="courseDescriptionInput" placeholder="Geben Sie einen Kursnamen ein">
+                                </div>
                             </section>
-                            </div>
-                            <div class="col-sm-6 ">
-                                <h4>Komponenten für das Image</h4>
-                                <hr/>
-                                <div class="form-group ">
-                                    <h5>Versionierung</h5>
-                                    <div class="checkbox ">
-                                        <label><input type="checkbox " value="git ">Git</label>
-                                    </div>
-                                </div>
-                                <div class="form-group ">
-                                    <h5>Programmiersprachen</h5>
-                                    <label class="checkbox-inline "><input type="checkbox " value="java ">Java</label>
-                                    <label class="checkbox-inline "><input type="checkbox " value="c++ ">C++</label>
-                                    <label class="checkbox-inline "><input type="checkbox " value="c ">C</label>
-                                    <label class="checkbox-inline "><input type="checkbox " value="android ">Android</label>
-                                </div>
-                                <div class="form-group ">
-                                    <h5>Entwicklungsumgebungen</h5>
-                                    <label class="checkbox-inline "><input type="checkbox " value="as ">Android Studio</label>
-                                    <label class="checkbox-inline "><input type="checkbox " value="netbeans ">Netbeans</label>
-                                    <label class="checkbox-inline "><input type="checkbox " value="vscode ">VS Code</label>
+                        </div>
+                        <div id="component-checkboxes" class="col-sm-6">
+                            <h4>Komponenten für das Image</h4>
+                            <hr/>
+                            <div class="form-group">
+                                <h5>Versionierung</h5>
+                                <div class="checkbox">
+                                    <label><input type="checkbox" value="git">Git</label>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <h5>Programmiersprachen</h5>
+                                <label class="checkbox-inline"><input type="checkbox" value="java">Java</label>
+                                <label class="checkbox-inline"><input type="checkbox" value="c++">C++</label>
+                                <label class="checkbox-inline"><input type="checkbox" value="c">C</label>
+                                <label class="checkbox-inline" style="text-decoration: line-through" title="Coming soon...">
+                                    <input type="checkbox" disabled="true" value="android">Android</label>
+                            </div>
+                            <div class="form-group">
+                                <h5>Entwicklungsumgebungen</h5>
+                                <label class="checkbox-inline" style="text-decoration: line-through" title="Coming soon...">
+                                    <input type="checkbox" disabled="true" value="as">Android Studio</label>
+                                <label class="checkbox-inline"><input type="checkbox" value="netbeans">Netbeans</label>
+                                <label class="checkbox-inline"><input type="checkbox" value="atom">Atom Editor</label>
+                            </div>
+                        </div>
                     </form>
-                    </div>
-                    </div>
+                    <button type="button " class="btn btn-default" onclick="handleCreateImageButton();"><span class="glyphicon glyphicon-plus "></span> Image erstellen</button>
                 </div>
+            </div>
+        </div>
 
-                <section>
-                    <h3>Bestehende Docker-Container</h3>
-                    <table id="container-table" class="table table-hover ">
-                        <thead>
-                            <tr>
-                                <th style="width: 10%; " scope="col ">#</th>
-                                <th style="width: 18%; " scope="col ">Name</th>
-                                <th style="width: 18%; " scope="col ">ID</th>
-                                <th style="width: 18%; " scope="col ">Status</th>
-                                <th style="width: 18%; " scope="col ">Image</th>
-                                <th style="width: 18%; " scope="col ">Bearbeiten</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                    <button type="button " class="btn btn-default " onclick="getAllDockerContainer(); ">
+        <section>
+            <h3>Bestehende Docker-Images</h3>
+            <table id="image-table" class="table table-hover ">
+                <thead>
+                    <tr>
+                        <th style="width: 10%; " scope="col ">#</th>
+                        <th style="width: 40%; " scope="col ">Name</th>
+                        <th style="width: 25%; " scope="col ">Size</th>
+                        <th style="width: 25%; " scope="col ">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="button " class="btn btn-default " onclick="getAllImages(); ">
                         <span class="glyphicon glyphicon-refresh "></span> Aktualisieren
                     </button>
-                </section>
-            </div>
+        </section>
 
-            <script src="js/Container.js "></script>
-            <script src="js/requests.js "></script>
-            <script src="js/eventlistener.js"></script>
+    </div>
 
-            <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/Container.js "></script>
+    <script src="js/Image.js"></script>
+    <script src="js/requests.js "></script>
+    <script src="js/eventlistener.js"></script>
 
-            <!-- Latest compiled and minified JavaScript -->
-            <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js " integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa " crossorigin="anonymous "></script>
+    <script src="js/jquery-3.3.1.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js " integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa " crossorigin="anonymous "></script>
 </body>
 
 </html>

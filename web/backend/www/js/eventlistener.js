@@ -10,11 +10,11 @@ document.getElementById('isInternalGit').addEventListener('change', function() {
         gitPassword.innerHTML = "";
         gitPassword.disabled = true;
         gitReposUrl.placeholder = "Testrepository";
-        gitReposLabel.innerHTML = "Git Repository Name";
+        gitReposLabel.innerHTML = "Git Repository Name *";
     } else {
         gitName.disabled = false;
         gitPassword.disabled = false;
         gitReposUrl.placeholder = "https://github.com/Username/repos.git";
-        gitReposLabel.innerHTML = "Git Repository URL";
+        gitReposLabel.innerHTML = "Git Repository URL *";
     }
 });

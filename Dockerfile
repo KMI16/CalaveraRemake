@@ -10,7 +10,6 @@ ENV GIT_REPOS_URL=yourgitrepos@github.com \
 
 # Add git script and give permission
 ADD scripts/gitpull.sh Desktop/Projekt/scripts/gitpull.sh
-ADD scripts/gitpull.sh /etc/profile.d/gitpull.sh
 
 # Add git push script and give permission
 ADD scripts/gitpush.sh Desktop/Projekt/scripts/gitpush.sh
@@ -18,8 +17,8 @@ ADD scripts/gitpush.sh Desktop/Projekt/scripts/gitpush.sh
 RUN chmod -R +x Desktop/Projekt/scripts/*
 
 # Copy SSH Key in order to allow ssh access from the internal github server
-ADD git-server/data/keys/id_rsa.pub Desktop/Projekt/ssh/id_rsa.pub
-ADD git-server/data/keys/id_rsa Desktop/Projekt/ssh/id_rsa
+ADD git-server/data/keys/id_calavera_git_server.pub Desktop/Projekt/ssh/id_calavera_git_server.pub
+ADD git-server/data/keys/id_calavera_git_server Desktop/Projekt/ssh/id_calavera_git_server
 
 # add both scripts to path so it can be excuted everywhere
 ENV PATH="${HOME}/Desktop/Projekt/scripts:${PATH}"
@@ -33,18 +32,19 @@ RUN apt-get install zip unzip
 # install nano
 RUN apt-get install nano
 
-# add netbeans repository in order to install
-RUN add-apt-repository ppa:vajdics/netbeans-installer && apt-get update
-
-# install default jdk and netbeans
-RUN apt-get install -y default-jdk
-RUN apt-get install -y netbeans-installer
-
-# create netbeans shortcut icon
-RUN ln -s $(which netbeans) Desktop
-
-# install git
-RUN apt-get install -y git
-
 # install ping :: DEBUG
 RUN apt-get install -y iputils-ping
+
+###################
+# custom components
+###################
+
+#install git
+RUN apt-get install -y git
+
+#install java
+RUN apt-get install -y default-jdk
+
+#install c
+RUN apt-get install -y gcc
+

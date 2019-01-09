@@ -1,21 +1,30 @@
 #!/bin/sh
 
+SSH_KEY_NAME="id_calavera_git_server"
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
+
+echo "${PURPLE}Setting up git-server${NC}"
+echo "${PURPLE}Creating necessary folders....${NC}"
 # clear data from the git-folder if exists
 # create data/repos and data/keys if not exists
-
 [ ! -d ${PWD}/data ] && mkdir -p ${PWD}/data
 [ ! -d ${PWD}/data/repos ] && mkdir -p ${PWD}/data/repos
 [ ! -d ${PWD}/data/keys ] && mkdir -p ${PWD}/data/keys
 
-#rm -f -r ${PWD}/data/repos/*
+echo "${PURPLE}Deleting existing keys${NC}"
 rm -f -r ${PWD}/data/keys/*
 
 # create new ssh-key if not exists
-if [ ! -f ~/.ssh/id_rsa.pub ]
+if [ ! -f ~/.ssh/${SSH_KEY_NAME}.pub ]
 then
-    ssh-keygen -t rsa -f ~/.ssh/id_rsa -C "KMI16@byom.de" -q -P ""
+    echo "${PURPLE}Creating ssh key...${NC}"
+    ssh-keygen -t rsa -f ~/.ssh/${SSH_KEY_NAME} -C "KMI16@byom.de" -q -P ""
 fi
 
+echo "${PURPLE}Copy ssh key...${NC}"
 # copy it into the keys folder of the git server
-cp ~/.ssh/id_rsa.pub ${PWD}/data/keys
-cp ~/.ssh/id_rsa ${PWD}/data/keys
+cp ~/.ssh/${SSH_KEY_NAME}.pub ${PWD}/data/keys
+cp ~/.ssh/${SSH_KEY_NAME} ${PWD}/data/keys
