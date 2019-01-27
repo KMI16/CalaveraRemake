@@ -17,8 +17,8 @@ ADD scripts/gitpush.sh Desktop/Projekt/scripts/gitpush.sh
 RUN chmod -R +x Desktop/Projekt/scripts/*
 
 # Copy SSH Key in order to allow ssh access from the internal github server
-ADD git-server/data/keys/id_calavera_git_server.pub Desktop/Projekt/ssh/id_calavera_git_server.pub
-ADD git-server/data/keys/id_calavera_git_server Desktop/Projekt/ssh/id_calavera_git_server
+ADD data/keys/id_calavera_git_server.pub Desktop/Projekt/ssh/id_calavera_git_server.pub
+ADD data/keys/id_calavera_git_server Desktop/Projekt/ssh/id_calavera_git_server
 
 # add both scripts to path so it can be excuted everywhere
 ENV PATH="${HOME}/Desktop/Projekt/scripts:${PATH}"
