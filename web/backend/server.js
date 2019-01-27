@@ -72,11 +72,12 @@ router.route('/image')
                         stream.on('end', resolve)
                         stream.on('error', reject)
                     }))
-                    .then(() =>
+                    .then(() => {
+                        console.log("Done");
                         fs.unlink(__dirname + '/../../', function(error) {
                             response.status(200).send("Docker image has been created successfully.");
-                        })
-                    ) //console.log("done"))
+                        });
+                    })
                     .catch(error => {
                         response.status(500).send("An internal server error occurred while creating the docker image");
                     });
@@ -193,6 +194,7 @@ app.use('/api', router);
 
 var port = process.env.PORT || 4200;
 
-app.listen(port, () => {
-    console.log("Server running on port " + port);
+const server = app.listen(port, () => { // '192.168.39.109'
+    console.log("Server running on localhost" + port);
 });
+server.timeout = 600000;

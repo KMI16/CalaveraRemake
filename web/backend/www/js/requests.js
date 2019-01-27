@@ -1,4 +1,4 @@
-var baseURL = 'http://127.0.0.1:4200/api/';
+var baseURL = 'http://localhost:4200/api/'; // 192.168.39.109:
 var containerList = [];
 var imageList = [];
 var canRefresh = true;
@@ -30,11 +30,15 @@ var getAllImages = function() {
 
         imageList = [];
         for (var i = 0; i < images.length; i++) {
-            imageList.push(new Image(images[i].name, images[i].size, images[i].status));
+            if (images[i].name) {
+                imageList.push(new Image(images[i].name, images[i].size, images[i].status));
+            }
         }
 
         if (processingImages.length > 0) {
-            imageList.push(processingImages);
+            for (var imgProcess of processingImages) {
+                imageList.push(imgProcess);
+            }
         }
 
         var imageDropdown = document.getElementById('imageSelection');
@@ -47,6 +51,8 @@ var getAllImages = function() {
 
         for (var image of imageList) {
             var element = document.createElement('option');
+            console.log(image);
+
             element.textContent = image.name.substring(image.name.indexOf('-') + 1);
             element.value = image.name;
             imageDropdown.appendChild(element);
@@ -271,6 +277,7 @@ var sendRequest = function(url, operation, params, contentType, callback) {
     }
 
     http.onreadystatechange = function() {
+        console.log(http);
         if (http.readyState === 4) {
             if (http.status == 200) {
                 callback(http);

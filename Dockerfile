@@ -48,3 +48,8 @@ RUN apt-get install -y default-jdk
 #install c
 RUN apt-get install -y gcc
 
+#install netbeans
+RUN add-apt-repository ppa:vajdics/netbeans-installer && apt-get update
+RUN apt-get install -y netbeans-installer
+RUN ln -s $(which netbeans) Desktop
+
