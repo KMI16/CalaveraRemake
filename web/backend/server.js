@@ -18,8 +18,15 @@ router.use(function (request, response, next) {
     next();
 });
 
-function createDockerContent(features) {
-
+/**
+ * This maps takes a String array and builds the corresponding installation command.
+ * It loops through the array and graps the installation instruction for the corresponding
+ * module name that shall be installed.
+ * 
+ * @param {String[]} features an array providing the keywords from the modules to be installed
+ * @return {String} a String containing the installation instructions for the given features list
+ */
+function createInstallationInstructionsForFeatureList(features) {
     var featureCommandMap = {
         "git": "#install git\nRUN apt-get install -y git",
         "java": "#install java\nRUN apt-get install -y default-jdk",
@@ -38,34 +45,42 @@ function createDockerContent(features) {
         featureString += featureCommandMap[features[i]] + "\n\n";
     }
 
-    return featureString; //"\nRUN apt-get install zip unzip";
+    return featureString;
 }
 
 router.route('/image')
+    /** image creation request */
     .post(function (request, response) {
+
+        // Step one is to copy the sample file, containing the general instructions for all docker files,
+        // into the root directory 
         fs.copyFile(__dirname + '/Dockerfile.sample', __dirname + '/../../Dockerfile', function (error) {
+
             if (error) {
                 response.status(500).send('An internal server error occured while creating the docker image');
                 return;
             }
 
-            var content = createDockerContent(request.body.features);
-            fs.appendFile(__dirname + '/../../Dockerfile', content, function (error) {
+
+            var featureInstallationInstructions = createInstallationInstructionsForFeatureList(request.body.features);
+            fs.appendFile(__dirname + '/../../Dockerfile', featureInstallationInstructions, function (error) {
                 if (error) {
                     response.status(500).send('Error while creating Dockerfile.');
                     return;
                 }
 
                 var tarStream = tar.pack(__dirname + '/../../');
-                var imageName = 'swe-' + request.body.title;
 
+                // construct the image name
+                var imageName = 'swe-' + request.body.title;
                 if (request.body.courseName) {
                     imageName += "-" + request.body.courseName;
                 }
-
                 imageName += ":latest";
                 imageName = imageName.toLocaleLowerCase();
 
+                // build the actual docker image and link the error,data,end Streams
+                // to the console
                 docker.image.build(tarStream, { t: imageName })
                     .then(stream => new Promise((resolve, reject) => {
                         stream.on('data', data => console.log(data.toString()))
@@ -84,8 +99,12 @@ router.route('/image')
             });
         });
     })
+    /** get Docker images request */
     .get(function (request, response) {
         docker.image.list().then(images => {
+
+            // find all images that are prefixed with 'swe-'
+            // and send the list back to the client
             var imageList = [];
             for (var image of images) {
                 if (image.data && image.data.RepoTags[0].startsWith('swe-')) {
@@ -103,20 +122,17 @@ router.route('/image')
     });
 
 router.route('/image/:image_name')
+    /** image delete request */
     .delete(function (request, response) {
         docker.image.list().then(images => {
+            // loop through all images and delete the image with the
+            // given name `request.params.image_name` 
             for (var i = 0; i < images.length; i++) {
                 var names = images[i].data.RepoTags;
                 if (names.includes(request.params.image_name)) {
-                    /*if (names.length == 1) {
-                        images[i].remove({ force: true });
-                        console.log("Image " + request.params.image_name + " deleted successfully");
-
-                        response.status(200).send("Image " + request.params.image_name + " deleted successfully");
-                    } else {
-                        response.status(200).send("Image " + request.params.image_name + " untagged successfully");*/
                     var exec = require('child_process').exec;
 
+                    // docker rmi removes the image from the system 
                     exec("docker rmi " + request.params.image_name + " -f", (error, stdout, stderr) => {
                         if (error != null) {
                             response.status(500).send("Image " + request.params.image_name + " could not be removed");
@@ -124,18 +140,15 @@ router.route('/image/:image_name')
                             response.status(200).send("Image " + request.params.image_name + " remvoed successfully");
                         }
                     });
-                    //}
                 }
             }
         })
     });
 
 router.route('/container')
+    /** container creation request */
     .post(function (request, response) {
-        //response.send("Got a POST request at /api/containers with " + request.body);
-
         console.log(request.body);
-
         docker.container.create(request.body).then(container => {
             container.start();
             response.status(200).send("Container has been started");
@@ -143,18 +156,31 @@ router.route('/container')
             response.status(500).send('Container hasn\'t been started ' + error);
         });
     })
+    /** get container list request */
     .get(function (request, response) {
         var containerArray = [];
 
         docker.container.list().then(containers => {
+            // loop through all containers and find all
+            // that are prefixed with 'swe' 
             for (var i = 0; i < containers.length; i++) {
                 if (containers[i].data.Image.startsWith('swe-')) {
                     var tempContainer = {};
+
+                    // grep all necessary information
                     tempContainer.name = containers[i].data.Names[0];
                     tempContainer.id = containers[i].data.Id;
                     tempContainer.status = containers[i].data.Status;
                     tempContainer.image = containers[i].data.Image;
                     console.log(containers[i].data);
+
+                    // add container in the form
+                    // {
+                    //     "name": "<name>",
+                    //      "id": "<id>",
+                    //      "status": "<status>"
+                    //      "image": "<image>"
+                    // }
                     containerArray.push(tempContainer);
                 }
             }
@@ -167,11 +193,11 @@ router.route('/container')
 
 
 router.route('/container/:container_id')
+    /** get container with certain id */
     .get(function (request, response) {
-
         response.send("Got a GET request at /api/containers/" + request.params.container_id);
-
     })
+    /** delete container with certain id */
     .delete(
         function (request, response) {
             docker.container.list().then(containers => {
