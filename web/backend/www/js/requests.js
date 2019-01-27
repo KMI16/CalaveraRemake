@@ -1,11 +1,11 @@
-var baseURL = 'http://localhost:4200/api/'; // 192.168.39.109:
+var baseURL = 'http://localhost:4200/api/';
 var containerList = [];
 var imageList = [];
 var canRefresh = true;
 
-window.onbeforeunload = function() { return canRefresh; }
+window.onbeforeunload = function () { return canRefresh; }
 
-window.onload = function() {
+window.onload = function () {
     getAllImages();
     getAllDockerContainer();
 }
@@ -15,11 +15,12 @@ window.onload = function() {
  * retrieve all images that are currently available. After retrieving
  * the data will be populated in the image select.
  */
-var getAllImages = function() {
+var getAllImages = function () {
     var url = baseURL + 'image';
-    sendRequest(url, 'GET', null, null, function(http) {
+    sendRequest(url, 'GET', null, null, function (http) {
         var images = JSON.parse(http.responseText).images;
 
+        // filter all images that are currently still in progress
         var processingImages = [];
         for (var img of imageList) {
             if (img.status == "in process") {
@@ -49,6 +50,7 @@ var getAllImages = function() {
         option.innerHTML = "Image auswählen";
         imageDropdown.appendChild(option);
 
+        // populate the images into the select box
         for (var image of imageList) {
             var element = document.createElement('option');
             console.log(image);
@@ -57,14 +59,20 @@ var getAllImages = function() {
             element.value = image.name;
             imageDropdown.appendChild(element);
         }
+        // update the image table
         updateImageTable();
     });
 }
 
-var handleCreateImageButton = function() {
+/**
+ * Handler to react to an onClick event of the button that creates a new image
+ */
+var handleCreateImageButton = function () {
     canRefresh = false;
     var features = [];
 
+    // retrieve selected modules from the checkboxes
+    // and push them into the features list
     var componentDiv = document.getElementById("component-checkboxes");
     var selectedBoxes = componentDiv.querySelectorAll('input[type="checkbox"]:checked');
 
@@ -72,16 +80,19 @@ var handleCreateImageButton = function() {
         features.push(selectedBoxes[i].value);
     }
 
+    // construct the post body
     var body = {
         "title": document.getElementById('imageNameInput').value,
         "features": features
     };
 
+    // if available, send the course description as well
     var courseDescriptionInput = document.getElementById('courseDescriptionInput').value;
     if (courseDescriptionInput != "") {
         body.courseName = courseDescriptionInput;
     }
 
+    // tag the title of the image with the 'swe-' tag
     var title = 'swe-' + body.title.toLowerCase();
     if (body.courseName) {
         title += '-' + body.courseName.toLowerCase();
@@ -89,14 +100,14 @@ var handleCreateImageButton = function() {
     imageList.push(new Image(title, 'n/a', 'in process'));
     updateImageTable();
 
-    sendRequest(baseURL + 'image', 'POST', JSON.stringify(body), 'application/json; charset=utf-8', function(http) {
+    sendRequest(baseURL + 'image', 'POST', JSON.stringify(body), 'application/json; charset=utf-8', function (http) {
         console.log(http.responseText);
         getAllImages();
     });
 
 }
 
-var handleStartContainerButton = function() {
+var handleStartContainerButton = function () {
     var container = {};
     container.Image = document.getElementById("imageSelection").value;
 
@@ -143,11 +154,11 @@ var handleStartContainerButton = function() {
 }
 
 
-var handleDuplicateButton = function(dockerID) {
+var handleDuplicateButton = function (dockerID) {
     getAllDockerContainer();
 }
 
-var handleEditButton = function(dockerID) {
+var handleEditButton = function (dockerID) {
     createAndStartContainer('');
 }
 
@@ -158,9 +169,9 @@ var handleEditButton = function(dockerID) {
  * 
  * @param {String} dockerID the docker to be deleted / stopped
  */
-var deleteDockerContainer = function(dockerID) {
+var deleteDockerContainer = function (dockerID) {
     var url = baseURL + 'container/' + dockerID;
-    sendRequest(url, 'DELETE', null, null, function(http) {
+    sendRequest(url, 'DELETE', null, null, function (http) {
         console.log(http.responseText);
 
         var indexToRemove = getIndexFromContainerId(dockerID);
@@ -169,14 +180,14 @@ var deleteDockerContainer = function(dockerID) {
     });
 }
 
-var handleDeleteImage = function(i) {
+var handleDeleteImage = function (i) {
     var image = imageList[i];
     deleteDockerImage(image.name);
 }
 
-var deleteDockerImage = function(name) {
+var deleteDockerImage = function (name) {
     var url = baseURL + 'image/' + name;
-    sendRequest(url, 'DELETE', null, null, function(http) {
+    sendRequest(url, 'DELETE', null, null, function (http) {
         console.log(http.responseText);
         getAllImages();
     });
@@ -188,9 +199,9 @@ var deleteDockerImage = function(name) {
  * 
  * @param {String} dockerID the docker to be retrieved
  */
-var getDockerContainerById = function(dockerID) {
+var getDockerContainerById = function (dockerID) {
     var url = baseURL + 'container/' + dockerID;
-    sendRequest(url, 'GET', null, null, function(http) {
+    sendRequest(url, 'GET', null, null, function (http) {
         var containerToInsert = JSON.parse(http.responseText);
         var indexToInsert = getIndexFromContainerId(containerToInsert.id);
 
@@ -209,7 +220,7 @@ var getDockerContainerById = function(dockerID) {
  * 
  * @returns the position of the container in the array or -1
  */
-var getIndexFromContainerId = function(containerID) {
+var getIndexFromContainerId = function (containerID) {
     for (var i = 0; i < containerList.length; i++) {
         if (containerList[i].id === containerID) {
             return i;
@@ -224,9 +235,9 @@ var getIndexFromContainerId = function(containerID) {
  * retrieve all containers that are currently running. After retrieving
  * the data will be populated in the container table. {@see #updateContainerTable(containers) }.
  */
-var getAllDockerContainer = function() {
+var getAllDockerContainer = function () {
     var url = baseURL + 'container';
-    sendRequest(url, 'GET', null, null, function(http) {
+    sendRequest(url, 'GET', null, null, function (http) {
         var containers = JSON.parse(http.responseText).containers;
 
         containerList = [];
@@ -247,10 +258,10 @@ var getAllDockerContainer = function() {
  * 
  * @param {Object} container the container to be added and started
  */
-var createAndStartContainer = function(container) {
+var createAndStartContainer = function (container) {
     var url = baseURL + 'container';
     canRefresh = false;
-    sendRequest(url, 'POST', JSON.stringify(container), 'application/json; charset=utf-8', function(http) {
+    sendRequest(url, 'POST', JSON.stringify(container), 'application/json; charset=utf-8', function (http) {
         console.log(http.responseText);
         canRefresh = true;
         getAllDockerContainer();
@@ -268,7 +279,7 @@ var createAndStartContainer = function(container) {
  * @param {String} contentType the content type - can be null to use default
  * @param {Function} callback function on success (status == 200 && readyState == 4)
  */
-var sendRequest = function(url, operation, params, contentType, callback) {
+var sendRequest = function (url, operation, params, contentType, callback) {
     var http = new XMLHttpRequest();
     http.open(operation, url);
 
@@ -276,7 +287,7 @@ var sendRequest = function(url, operation, params, contentType, callback) {
         http.setRequestHeader('Content-type', contentType);
     }
 
-    http.onreadystatechange = function() {
+    http.onreadystatechange = function () {
         console.log(http);
         if (http.readyState === 4) {
             if (http.status == 200) {
@@ -295,7 +306,7 @@ var sendRequest = function(url, operation, params, contentType, callback) {
  * the id {@code container-table}. Before populating the data it clears the table.
  * {@see #createTableRowFromContainer(number, container) }.
  */
-var updateContainerTable = function() {
+var updateContainerTable = function () {
     var table = document.getElementById('container-table').getElementsByTagName('tbody')[0];
 
     // clear table 
@@ -307,7 +318,7 @@ var updateContainerTable = function() {
     }
 }
 
-var updateImageTable = function() {
+var updateImageTable = function () {
     var table = document.getElementById('image-table').getElementsByTagName('tbody')[0];
 
     //clear table
@@ -330,7 +341,7 @@ var updateImageTable = function() {
  * @param {Container} container the docker container object containing the table data
  * @return the table row {DOMObject} that was created
  */
-var createTableRowFromContainer = function(i, container) {
+var createTableRowFromContainer = function (i, container) {
     var tr = document.createElement('tr');
     tr.innerHTML = '<th scope="row">' + (i + 1) + '</th>';
 
@@ -351,7 +362,7 @@ var createTableRowFromContainer = function(i, container) {
     return tr;
 }
 
-var createTableRowFromImage = function(i, image) {
+var createTableRowFromImage = function (i, image) {
     var tr = document.createElement('tr');
     tr.innerHTML = '<th scope="row">' + (i + 1) + '</th>'
 
@@ -375,7 +386,7 @@ var createTableRowFromImage = function(i, image) {
  * Creates the control buttons for each row. Each row has a edit, clone and stop button.
  * @param {String} id the docker id 
  */
-var createButtonRow = function(id) {
+var createButtonRow = function (id) {
     id = id + "";
     return '<div class="btn-group" role="group" aria-label="...">' +
         '<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Container bearbeiten" onclick="handleEditButton(\'' + id + '\');">' +
