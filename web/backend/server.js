@@ -14,7 +14,7 @@ app.use(express.static(__dirname + '/www/'));
 app.use(cors());
 app.use(express.json());
 
-router.use(function(request, response, next) {
+router.use(function (request, response, next) {
     next();
 });
 
@@ -42,15 +42,15 @@ function createDockerContent(features) {
 }
 
 router.route('/image')
-    .post(function(request, response) {
-        fs.copyFile(__dirname + '/Dockerfile.sample', __dirname + '/../../Dockerfile', function(error) {
+    .post(function (request, response) {
+        fs.copyFile(__dirname + '/Dockerfile.sample', __dirname + '/../../Dockerfile', function (error) {
             if (error) {
                 response.status(500).send('An internal server error occured while creating the docker image');
                 return;
             }
 
             var content = createDockerContent(request.body.features);
-            fs.appendFile(__dirname + '/../../Dockerfile', content, function(error) {
+            fs.appendFile(__dirname + '/../../Dockerfile', content, function (error) {
                 if (error) {
                     response.status(500).send('Error while creating Dockerfile.');
                     return;
@@ -74,7 +74,7 @@ router.route('/image')
                     }))
                     .then(() => {
                         console.log("Done");
-                        fs.unlink(__dirname + '/../../', function(error) {
+                        fs.unlink(__dirname + '/../../Dockerfile', function (error) {
                             response.status(200).send("Docker image has been created successfully.");
                         });
                     })
@@ -84,7 +84,7 @@ router.route('/image')
             });
         });
     })
-    .get(function(request, response) {
+    .get(function (request, response) {
         docker.image.list().then(images => {
             var imageList = [];
             for (var image of images) {
@@ -103,7 +103,7 @@ router.route('/image')
     });
 
 router.route('/image/:image_name')
-    .delete(function(request, response) {
+    .delete(function (request, response) {
         docker.image.list().then(images => {
             for (var i = 0; i < images.length; i++) {
                 var names = images[i].data.RepoTags;
@@ -131,7 +131,7 @@ router.route('/image/:image_name')
     });
 
 router.route('/container')
-    .post(function(request, response) {
+    .post(function (request, response) {
         //response.send("Got a POST request at /api/containers with " + request.body);
 
         console.log(request.body);
@@ -143,7 +143,7 @@ router.route('/container')
             response.status(500).send('Container hasn\'t been started ' + error);
         });
     })
-    .get(function(request, response) {
+    .get(function (request, response) {
         var containerArray = [];
 
         docker.container.list().then(containers => {
@@ -167,13 +167,13 @@ router.route('/container')
 
 
 router.route('/container/:container_id')
-    .get(function(request, response) {
+    .get(function (request, response) {
 
         response.send("Got a GET request at /api/containers/" + request.params.container_id);
 
     })
     .delete(
-        function(request, response) {
+        function (request, response) {
             docker.container.list().then(containers => {
                 for (var i = 0; i < containers.length; i++) {
                     if (containers[i].data.Id == request.params.container_id) {
@@ -184,7 +184,7 @@ router.route('/container/:container_id')
             });
             response.send("Container " + request.params.container_id + ' deleted successfully.');
         },
-        function(err, obj) {
+        function (err, obj) {
             response.send("Something went wrong with DELETE request at /api/containers/" + request.params.container_id);
         }
     );
@@ -194,7 +194,7 @@ app.use('/api', router);
 
 var port = process.env.PORT || 4200;
 
-const server = app.listen(port, () => { // '192.168.39.109'
+const server = app.listen(port, () => {
     console.log("Server running on localhost" + port);
 });
 server.timeout = 600000;
